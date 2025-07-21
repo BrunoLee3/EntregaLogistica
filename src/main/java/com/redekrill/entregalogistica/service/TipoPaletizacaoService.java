@@ -21,7 +21,11 @@ public class TipoPaletizacaoService {
         return repository.findAll();
     }
 
-    public void createPaletizacao(TipoPaletizacao tipoPaletizacao){
-        repository.save(tipoPaletizacao);
+    public TipoPaletizacao createPaletizacao(TipoPaletizacao tipoPaletizacao){
+        return repository.save(tipoPaletizacao);
+    }
+
+    public void deletePaletizacao(Integer id){
+        repository.deleteById(id);
     }
 }

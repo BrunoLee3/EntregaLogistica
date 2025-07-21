@@ -4,6 +4,7 @@ import com.redekrill.entregalogistica.Model.Agendamento;
 import com.redekrill.entregalogistica.dto.AgendamentoDTO;
 import com.redekrill.entregalogistica.dto.AgendamentoResponseDTO;
 import com.redekrill.entregalogistica.service.AgendamentoService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/agendamentos")
@@ -26,45 +26,47 @@ public class AgendamentoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AgendamentoResponseDTO>> getAgendamentos(){
-        return ResponseEntity.status(HttpStatus.OK).body(service.listAgendamentos());
+    public ResponseEntity<List<AgendamentoResponseDTO>> getAll() {
+        return ResponseEntity.ok(service.listAgendamentos());
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<Optional<AgendamentoResponseDTO>> getAgendamentoById(@PathVariable("id") Integer id){
-        return ResponseEntity.status(HttpStatus.OK).body(service.findAgentamento(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<AgendamentoResponseDTO> getById(@PathVariable Integer id) {
+        return service.findAgentamento(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<AgendamentoDTO> postAgendamento(@RequestBody @Valid AgendamentoDTO dto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.createAgendamento(dto));
-
+    public ResponseEntity<AgendamentoDTO> create(@RequestBody @Valid AgendamentoDTO dto) {
+        AgendamentoDTO created = service.createAgendamento(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping(path = "/{id}")
-    public Agendamento putAgendamento(
-            @RequestBody Agendamento agendamento,
-            @PathVariable("id") Integer id
-    ) {
-        return service.updateAgendamento(agendamento, id);
+    @PutMapping("/{id}")
+    public ResponseEntity<Agendamento> update(@PathVariable Integer id, @RequestBody @Valid Agendamento agendamento) {
+        try {
+            Agendamento updated = service.updateAgendamento(agendamento, id);
+            return ResponseEntity.ok(updated);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @DeleteMapping(path = "/{id}")
-    public void deleteAgendamento(@PathVariable("id") Integer id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         service.deleteAgendamento(id);
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValidException(
-            MethodArgumentNotValidException ex
-    ){
+    public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException ex) {
         var erros = new HashMap<String, String>();
-        ex.getBindingResult().getAllErrors()
-                .forEach(error -> {
-                    var nomeCampo = ((FieldError) error).getField();
-                    var msgErro = error.getDefaultMessage();
-                    erros.put(nomeCampo, msgErro);
-                });
-        return new ResponseEntity<>(erros, HttpStatus.BAD_REQUEST);
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            var nomeCampo = ((FieldError) error).getField();
+            var msgErro = error.getDefaultMessage();
+            erros.put(nomeCampo, msgErro);
+        });
+        return ResponseEntity.badRequest().body(erros);
     }
 }

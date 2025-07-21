@@ -2,6 +2,8 @@ package com.redekrill.entregalogistica.controller;
 
 import com.redekrill.entregalogistica.Model.Pedido;
 import com.redekrill.entregalogistica.service.PedidoService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,17 +19,19 @@ public class PedidoController {
     }
 
     @GetMapping
-    public List<Pedido> getPedidos(){
-        return service.listPedidos();
+    public ResponseEntity<List<Pedido>> getAll(){
+        return ResponseEntity.ok(service.listPedidos());
     }
 
     @PostMapping
-    public Pedido postPedido(@RequestBody Pedido pedido){
-        return service.createPedido(pedido);
+    public ResponseEntity<Pedido> create(@RequestBody Pedido pedido){
+        Pedido created = service.createPedido(pedido);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @DeleteMapping(path = "/{id}")
-    public void deletePedido(@PathVariable("id") Integer id){
+    public ResponseEntity<Void> delete(@PathVariable("id") Integer id){
         service.deletePedido(id);
+        return ResponseEntity.noContent().build();
     }
 }

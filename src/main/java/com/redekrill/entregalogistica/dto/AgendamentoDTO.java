@@ -1,6 +1,8 @@
 package com.redekrill.entregalogistica.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -8,6 +10,7 @@ import java.time.LocalDate;
 
 public record AgendamentoDTO(
         @NotNull(message = "A data é obrigatória")
+        @FutureOrPresent(message = "A data não pode estar no passado")
         LocalDate data,
 
         @NotNull(message = "A faixa horária é obrigatória")

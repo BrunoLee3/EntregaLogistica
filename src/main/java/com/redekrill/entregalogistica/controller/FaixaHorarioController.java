@@ -3,7 +3,8 @@ package com.redekrill.entregalogistica.controller;
 import com.redekrill.entregalogistica.Model.FaixaHorario;
 import com.redekrill.entregalogistica.service.FaixaHorarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,17 +21,19 @@ public class FaixaHorarioController {
     }
 
     @GetMapping
-    public List<FaixaHorario> getFaixasHorario(){
-        return service.listFaixasHorario();
+    public ResponseEntity<List<FaixaHorario>> getAll(){
+        return ResponseEntity.ok(service.listFaixasHorario());
     }
 
     @PostMapping
-    public FaixaHorario postFaixaHorario(@RequestBody FaixaHorario faixaHorario){
-        return service.createFaixaHorario(faixaHorario);
+    public ResponseEntity<FaixaHorario> create(@RequestBody FaixaHorario faixaHorario){
+        FaixaHorario created = service.createFaixaHorario(faixaHorario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @DeleteMapping(path = "/{id}")
-    public void deleteFaixaHorario(@PathVariable("id") Integer id){
+    public ResponseEntity<Void> delete(@PathVariable("id") Integer id){
         service.deleteFaixaHorario(id);
+        return ResponseEntity.noContent().build();
     }
 }
