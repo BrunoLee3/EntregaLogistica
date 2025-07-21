@@ -1,5 +1,6 @@
 package com.redekrill.entregalogistica.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,5 +21,7 @@ public class Pedido {
     private int qtdPaletes;
 
     @OneToOne(mappedBy = "pedido")
+    @JsonBackReference
     private Agendamento agendamento;
+
 }

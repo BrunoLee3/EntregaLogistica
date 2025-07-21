@@ -24,7 +24,7 @@ CREATE TABLE agendamento (
     id INT PRIMARY KEY AUTO_INCREMENT,
     data DATE NOT NULL,
     id_faixa_horario INT NOT NULL,
-    id_pedido INT NOT NULL,
+    id_pedido INT NOT NULL UNIQUE,
     fornecedor VARCHAR(80) NOT NULL,
     email_fornecedor VARCHAR(80) NOT NULL,
     id_tipo_caminhao INT NOT NULL,

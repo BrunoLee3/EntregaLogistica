@@ -30,13 +30,6 @@ public class AgendamentoController {
         return ResponseEntity.ok(service.listAgendamentos());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<AgendamentoResponseDTO> getById(@PathVariable Integer id) {
-        return service.findAgentamento(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
     @PostMapping
     public ResponseEntity<AgendamentoDTO> create(@RequestBody @Valid AgendamentoDTO dto) {
         AgendamentoDTO created = service.createAgendamento(dto);

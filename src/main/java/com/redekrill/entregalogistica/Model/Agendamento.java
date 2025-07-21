@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
-import java.util.Set;
 
 @Entity
 @Table
@@ -25,8 +24,8 @@ public class Agendamento {
     @JoinColumn(name = "id_faixa_horario")
     private FaixaHorario faixaHorario;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "id_pedido")
+    @OneToOne
+    @JoinColumn(name = "id_pedido", unique = true)
     private Pedido pedido;
 
     @Column(nullable = false, length = 80)

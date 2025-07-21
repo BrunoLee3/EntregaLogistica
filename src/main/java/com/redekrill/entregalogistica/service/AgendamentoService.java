@@ -60,20 +60,21 @@ public class AgendamentoService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<AgendamentoResponseDTO> findAgentamento(Integer id){
-        return repository.findById(id)
-                .map(mapper::toDTO);
-    }
-
     public AgendamentoDTO createAgendamento(AgendamentoDTO dto){
         var agendamento = mapper.toEntity(dto);
         agendamento.setFaixaHorario(faixaHorarioRepository.findById(dto.IdfaixaHorario()).orElse(null));
-        agendamento.setPedido(pedidoRepository.findById(dto.idPedido()).orElse(null));
+
+        var pedido = pedidoRepository.findById(dto.idPedido()).orElse(null);
+        if (pedido == null) {
+            throw new EntityNotFoundException("Pedido não encontrado para o id: " + dto.idPedido());
+        }
+        agendamento.setPedido(pedido);
+
         agendamento.setTipoCaminhao(tipoCaminhaoRepository.findById(dto.idTipoCaminhao()).orElse(null));
         agendamento.setTipoPaletizacao(tipoPaletizacaoRepository.findById(dto.idTipoPaletizacao()).orElse(null));
 
-        int totalPaletesData = calculaTotalPaletesDoDia(agendamento.getData(), agendamento.getPedido().getQtdPaletes());
-        int totalPaletesFaixaHoraria = calculaTotalPaletesFaixaHora(agendamento.getFaixaHorario(), agendamento.getPedido().getQtdPaletes());
+        int totalPaletesData = calculaTotalPaletesDoDia(agendamento.getData(), pedido.getQtdPaletes());
+        int totalPaletesFaixaHoraria = calculaTotalPaletesFaixaHora(agendamento.getFaixaHorario(), pedido.getQtdPaletes());
 
         if (totalPaletesData > limitePaletesDia) {
             System.out.println("Limite de 480 paletes por dia excedido");
